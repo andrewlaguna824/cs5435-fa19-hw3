@@ -64,7 +64,9 @@ def do_login(db):
         
         # FINDME: admin bytes 0x00 (not admin) or 0x01 (admin) concatentated with plaintext password
         admin_cookie_pt = app.api.encr_decr.format_plaintext(int(user.admin), password)
-        print("admin cookie plaintext: "+ str(admin_cookie_pt))
+        print("********************************************************")
+        print("LOGIN: admin cookie plaintext: "+ str(admin_cookie_pt))
+        print("********************************************************")
         ctxt = cbc.encrypt(admin_cookie_pt)
         response.set_cookie("admin", ctxt.hex())
         return redirect("/profile/{}".format(username))

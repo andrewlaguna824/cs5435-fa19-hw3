@@ -20,9 +20,15 @@ encryption_key = b'\x00'*16
 @post('/setcoins')
 @logged_in
 def set_coins(db, session):
+    print("********************************************")
+    print("SET COINS")
+    print("********************************************")
+   
     admin = get_user(db, session.get_username())
     ctxt = request.get_cookie("admin")
+    print("********************************************")
     print("admin cookie hex: " + ctxt)
+    print("********************************************")
     ctxt_bytes = bytes.fromhex(ctxt)
     cbc = app.api.encr_decr.Encryption(encryption_key)
     try:
@@ -38,7 +44,9 @@ def set_coins(db, session):
     # FINDME: Decrypt returns False if there was a padding exception
     # Response is 200 OK even if admin flag check fails
     if not dpt:
+        print("********************************************")
         print("FINDME: bad padding for admin cookie")
+        print("********************************************")
         return template(
                 "profile",
                 user=admin,
@@ -51,7 +59,7 @@ def set_coins(db, session):
     print("FINDME: Is admin user: " + str(is_admin_user))
     print("********************************************")
     if not is_admin_user:
-        # response.status = 400
+        response.status = 400
         return template(
             "profile",
             user=admin,
