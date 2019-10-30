@@ -35,7 +35,10 @@ def set_coins(db, session):
                 error="Unspecified error.",
                 admin=admin.admin,
                 )
-    if not dpt:#Decrypt returns False if there was a padding exceptionu
+    # FINDME: Decrypt returns False if there was a padding exception
+    # Response is 200 OK even if admin flag check fails
+    if not dpt:
+        print("FINDME: bad padding for admin cookie")
         return template(
                 "profile",
                 user=admin,
@@ -44,8 +47,11 @@ def set_coins(db, session):
                 admin=admin.admin,
                 )
     is_admin_user = app.api.encr_decr.is_admin_cookie(dpt)
-    print("Is admin user: " + str(is_admin_user))
+    print("********************************************")
+    print("FINDME: Is admin user: " + str(is_admin_user))
+    print("********************************************")
     if not is_admin_user:
+        # response.status = 400
         return template(
             "profile",
             user=admin,

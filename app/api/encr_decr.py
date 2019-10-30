@@ -9,6 +9,7 @@ def format_plaintext(is_admin, password):
     tmp = bytearray(str.encode(password))
     return bytes(bytearray((is_admin).to_bytes(1,"big")) + tmp)
 
+# FINDME: Checks if the first byte is admin flag
 def is_admin_cookie(decrypted_cookie):
     return decrypted_cookie[0] == 1
 
