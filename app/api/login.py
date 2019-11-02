@@ -22,7 +22,11 @@ from app.api.hash_table import HashTable,Entry
 encryption_key = b'\x00'*16
 hash_key = b'\x01'*16
 htsize = 2**16
+# TODO: HashTable to exploit
 param_ht = HashTable(htsize, hash_key)
+print("#########################################################")
+print(" ### Hash Table Key {}".format(param_ht.tkey))
+print("#########################################################")
 
 @get('/login')
 def login():

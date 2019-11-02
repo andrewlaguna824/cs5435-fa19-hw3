@@ -9,7 +9,7 @@ def ht_hash(hashkey, inval, htsize):
 
 #Put your collision-finding code here.
 #Your function should output the colliding strings in a list.
-def find_collisions(key):
+def find_collisions(key, num_collisions):
     pass
 
 #Implement this function, which takes the list of
@@ -21,5 +21,6 @@ def check_collisions(key, colls):
 if __name__=='__main__':
     #Look in the source code of the app to
     #find the key used for hashing.
-    key = None
-    colls = find_collisions(key)
+    ht_size = 2**16 # TODO: Hardcoded
+    hash_key = b'\x01'*16
+    colls = find_collisions(hash_key, 20)

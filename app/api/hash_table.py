@@ -75,7 +75,7 @@ class HashBucket:
         else:
             return self.entries[ind].value
     
-#A closed-addressing hash table with collision resolution via chaining.
+# A closed-addressing hash table with collision resolution via chaining.
 class HashTable:
     default_tkey = b'\x00'*16
     
@@ -85,20 +85,19 @@ class HashTable:
         self.tkey = HashTable.default_tkey
         self.occupied = 0
 
-    #Returns the siphash of the input with the hash table's key.
+    # Returns the siphash of the input with the hash table's key.
     def get_hash(self, to_hash):
         return siphash.SipHash_2_4(self.tkey, to_hash).hash()
 
-    
-    #Inserts the pair <e.key, e.value> into the hash table.
-    #If some record with e.key already exists, set its value to e.value.
-    #Otherwise create a new entry with key e.key and value e.value.
-    #Returns True if the operation succeeded.
+    # Inserts the pair <e.key, e.value> into the hash table.
+    # If some record with e.key already exists, set its value to e.value.
+    # Otherwise create a new entry with key e.key and value e.value.
+    # Returns True if the operation succeeded.
     def insert_entry(self, e,print_loads=False):
         assert not (e.key is None or e.value is None)
-        #print("Calling insert for key-value pair: " + str(e))
+        print("Calling insert for key-value pair: " + str(e))
         entry_hval = self.get_hash(e.key)
-        #print("hash value is: " + str(entry_hval))
+        print("hash value is: " + str(entry_hval))
         table_index = entry_hval % self.size
         if print_loads:
             print("Bucket loads:" + str(list(self.table[x].get_size() for x in range(self.size))))
@@ -107,15 +106,16 @@ class HashTable:
     def insert(self, ikey, ivalue):
         assert isinstance(ikey, str)
         return self.insert_entry(Entry(ikey.encode("utf8"),ivalue))
-    #If a pair with key 'key_to_delete' exists, remove it from the hash table.
-    #Else, do nothing. Returns True if the operation succeeded.
+
+    # If a pair with key 'key_to_delete' exists, remove it from the hash table.
+    # Else, do nothing. Returns True if the operation succeeded.
     def delete(self, key_to_delete):
         assert not key_to_delete is None
         print("Calling delete for key: " + str(key_to_delete))
         raise Exception("We're not implementing delete right now.")
     
-    #If a pair with key 'key_to_read' exists, locate it and return its value.
-    #Returns the value associated to key_to_read, and False if no such value exists.
+    # If a pair with key 'key_to_read' exists, locate it and return its value.
+    # Returns the value associated to key_to_read, and False if no such value exists.
     def read(self, key_to_read):
         assert not key_to_read is None
         print("Calling read for key: " + str(key_to_read))
