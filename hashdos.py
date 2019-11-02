@@ -2,8 +2,8 @@ from requests import codes, Session
 
 LOGIN_FORM_URL = "http://localhost:8080/login"
 
-#This function will send the login form
-#with the colliding parameters you specify.
+# This function will send the login form
+# with the colliding parameters you specify.
 def do_login_form(sess, username,password,params=None):
     data_dict = {"username":username,\
                 "password":password,\
