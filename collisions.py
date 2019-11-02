@@ -22,31 +22,50 @@ def find_collisions(key, ht_size, num_collisions):
 
     # ascii = b''.join([chr(i) for i in range(33, 127)])
 
-    # try to find matching hashes
-    found = {}
+    # try to find matching hashes for "test"
     letters = string.ascii_lowercase
-    matches = []
-    # for i in range(5000):
-    for i in range(5000):
-         # Build random 4 byte random string
-         # s = b''.join([random.choice(ascii) for _ in range(4)])
-         # print("Random string: {}".format(s))
-         s = ''.join(random.choice(letters) for i in range(4))
-         # print("Random string: {}".format(s))
+    print("Checking matching hashes for string '{}'; hash '{}'".format(s, h))
+    colliding_strings = {}
+    colliding_strings[s] = True
+    # for i in range(500000):
+    while len(colliding_strings) < num_collisions:
+        # Build random 4 byte strings
+        s_random = ''.join(random.choice(letters) for i in range(8))
+       
+        # Calculate hash
+        h_test = ht_hash(key, s_random.encode('utf-8'), ht_size)
+     
+        # Check if the hash matches ours
+        if h_test == h:
+            if s_random not in colliding_strings:
+                print("Found two colliding hashes: {} == {}; Hash: {}".format(s, s_random, h))
+                colliding_strings[s_random] = True
 
-         # Calculate hash
-         h = ht_hash(key, s.encode('utf-8'), ht_size)
-         print("Hash: {}".format(h))
-         if h in found:
-             v = found[h]
-             if v == s:
-                 print("Same hash and same string")
-                 continue
-             else:
-                 print("Found two colliding hashes: {} == {}".format(v, s))
-                 # Add to list of matches
-         else:
-             found[h] = s
+    return list(colliding_strings.keys())
+ 
+    # found = {}
+    # letters = string.ascii_lowercase
+    # matches = []
+    # for i in range(5000):
+    #      # Build random 4 byte random string
+    #      # s = b''.join([random.choice(ascii) for _ in range(4)])
+    #      # print("Random string: {}".format(s))
+    #      s = ''.join(random.choice(letters) for i in range(4))
+    #      # print("Random string: {}".format(s))
+
+    #      # Calculate hash
+    #      h = ht_hash(key, s.encode('utf-8'), ht_size)
+    #      print("Hash: {}".format(h))
+    #      if h in found:
+    #          v = found[h]
+    #          if v == s:
+    #              print("Same hash and same string")
+    #              continue
+    #          else:
+    #              print("Found two colliding hashes: {} == {}; Hash: {}".format(v, s, h))
+    #              # Add to list of matches
+    #      else:
+    #          found[h] = s
 
 # Implement this function, which takes the list of
 # collisions and verifies they all have the same
@@ -60,3 +79,5 @@ if __name__=='__main__':
     ht_size = 2**16 # TODO: Hardcoded
     hash_key = b'\x01'*16
     colls = find_collisions(hash_key, ht_size, 20)
+
+    print("Collisions: {}".format(colls))
