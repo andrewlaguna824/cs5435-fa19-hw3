@@ -26,7 +26,7 @@ def do_attack():
     # Get 1000 collisions
     ht_size = 2**16
     hash_key = b'\x00'*16
-    colls = collisions.find_collisions(hash_key, ht_size, 20)
+    colls = collisions.find_collisions(hash_key, ht_size, 1000)
     print("Collisions: {}".format(colls))
     
     # Put your colliding inputs in this dictionary as parameters.
