@@ -95,10 +95,12 @@ class HashTable:
     # Returns True if the operation succeeded.
     def insert_entry(self, e,print_loads=False):
         assert not (e.key is None or e.value is None)
+        print("Hash key: {}".format(self.tkey))
         print("Calling insert for key-value pair: " + str(e))
         entry_hval = self.get_hash(e.key)
         print("hash value is: " + str(entry_hval))
         table_index = entry_hval % self.size
+        print("Table index: {}".format(table_index))
         if print_loads:
             print("Bucket loads:" + str(list(self.table[x].get_size() for x in range(self.size))))
         return self.table[table_index].add_entry(e)
