@@ -20,6 +20,7 @@ def find_collisions(key, ht_size, num_collisions):
     print("Checking matching hashes for string '{}'; hash '{}'".format(s, h))
     colliding_strings = {}
     colliding_strings[s] = True
+    count = 0
     while len(colliding_strings) < num_collisions:
         # Build random 4 byte strings
         s_random = ''.join(random.choice(letters) for i in range(8))
@@ -30,7 +31,8 @@ def find_collisions(key, ht_size, num_collisions):
         # Check if the hash matches ours
         if h_test == h:
             if s_random not in colliding_strings:
-                print("Found two colliding hashes: {} == {}; Hash: {}".format(s, s_random, h))
+                count += 1
+                print("{}. Found two colliding hashes: {} == {}; Hash: {}".format(count, s, s_random, h))
                 colliding_strings[s_random] = True
 
     return list(colliding_strings.keys())
