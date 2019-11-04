@@ -51,6 +51,15 @@ def po_attack_2blocks(po, ctx):
     c0, c1 = list(split_into_blocks(ctx, po.block_length))
     msg = ''
     # TODO: Implement padding oracle attack for 2 blocks of messages.
+
+    plaintext = bytearray(16)
+    for i in range(15, -1, -1):
+        test = bytearray(16)
+        for val in range(256):
+            test[i] = bytes([val])
+            print(test)
+            # if test passes padding check then
+            # plaintext[i] = val ^ c0[i] ^ bytes([i])
     return msg
 
 def po_attack(po, ctx):
