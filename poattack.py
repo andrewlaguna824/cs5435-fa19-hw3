@@ -72,14 +72,27 @@ def po_attack(po, ctx):
     nblocks = len(ctx_blocks)
     # TODO: Implement padding oracle attack for arbitrary length message.
 
-def is_response_error(response):
+def is_response_ok(response):
     """
     Given a requests.Response object, does the 'error' div exist?
     """
     error = int(response.text.find('error'))
     if error != -1:
         print("Error Div found at index: {}".format(error))
+        return False
+    return True
 
+def check_padding_response(cookie):
+    """
+    Given a cookie, make request to /setcoins with that cookie as admin cookie
+    """
+    sess.cookies.set("admin", None)
+    sess.cookies.set("admin", cookie.hex())
+    print("Cookies after maul: {}".format(sess.cookies.get_dict()))
+    result, response = do_setcoins_form(sess, uname, 5000)
+    print(response.text)
+    
+    return is_response_ok(response)
 
 if __name__ == "__main__":
     print("Running Padding Oracle Attack")
@@ -99,11 +112,9 @@ if __name__ == "__main__":
     C0 = admin_cookie_bytes[0]
     print("CO: {}".format(C0))
     admin_cookie_bytes[0] = 1
-    sess.cookies.set("admin", None)
-    sess.cookies.set("admin", admin_cookie_bytes.hex())
-    print("Cookies after maul: {}".format(sess.cookies.get_dict()))
-    result, response = do_setcoins_form(sess, uname, 5000)
-    print(response.text)
+
+    success = check_padding_response(bytes(16))
+    print("Success? {}".format(success))
 
     # TODO: Maul code from part 1.1
     # Maul the admin cookie in the 'sess' object here
