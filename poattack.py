@@ -65,15 +65,15 @@ def po_attack_2blocks(po, ctx):
             # Logical OR test byte with C1
             # C1_prime = bytes(a | b for (a,b) in zip(c1, test))
             C1_prime = test + c1
-            print("test byte array: {}".format(test))
-            print("C prime: {}".format(C1_prime))
+           # print("test byte array: {}".format(test))
+            #print("C prime: {}".format(C1_prime))
             # if check_padding_response(str(test).encode('utf-8')):
             if check_padding_response(C1_prime):
-                print("Padding passed")
+                print("Padding passed: {}".format((i,val)))
                 passes += 1
                 plaintext[i] = val ^ c0[i] ^ (16 - i)
                 break
-    print("Passes: {}".format(passes))
+    #print("Passes: {}".format(passes))
     return plaintext
 
 def po_attack(po, ctx):
