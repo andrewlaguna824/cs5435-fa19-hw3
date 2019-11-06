@@ -58,7 +58,7 @@ def po_attack_2blocks(po, ctx):
 
     plaintext = bytearray(16)
     passes = 0
-    for i in range(15, -1, -1): 
+    for i in range(15, -1, -1):
         test = bytearray(16)
         for j in range(i + 1, 16):
             test[j] = plantext[j] ^ c0[j] ^ (16 - i)
