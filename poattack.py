@@ -71,7 +71,7 @@ def po_attack_2blocks(po, ctx):
             test[i] = bytes([val])
             print(test)
             # if test passes padding check then
-            if (check_padding_response(str(test).encode('utf-8')):
+            if check_padding_response(str(test).encode('utf-8')):
                 plaintext[i] = val ^ c0[i] ^ bytes([i]) # Can't XOR bytes objects
     return msg
 
