@@ -19,7 +19,7 @@ def do_setcoins_form(sess,uname, coins):
     "amount":str(coins),\
     }
     response = sess.post(SETCOINS_FORM_URL, data_dict)
-    print("Response code: {}".format(response.status_code))
+    # print("Response code: {}".format(response.status_code))
     return response.status_code == codes.ok, response
 
 def do_attack():

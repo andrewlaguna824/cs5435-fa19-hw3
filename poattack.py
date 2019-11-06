@@ -29,8 +29,7 @@ class PaddingOracle(object):
         print("Block size bytes: {}".format(self._block_size_bytes))
 
     @property
-    def block_length(self):
-        return self._block_size_bytes
+    def block_length(self): return self._block_size_bytes
 
     # you'll need to send the provided ciphertext
     # as the admin cookie, retrieve the request,
@@ -63,6 +62,7 @@ def po_attack_2blocks(po, ctx):
         for val in range(256):
             test[i] = val
             if check_padding_response(str(test).encode('utf-8')):
+                print("Padding passed")
                 plaintext[i] = val ^ c0[i] ^ (16 - i)
     return plaintext
 
@@ -128,7 +128,8 @@ if __name__ == "__main__":
     first_two_blocks = TEST_COOKIE[:32]
     # Instantitate padding oracle
     po = PaddingOracle(SETCOINS_FORM_URL)
-    po_attack_2blocks(po, first_two_blocks)
+    result = po_attack_2blocks(po, first_two_blocks)
+    print("PO Attack 2 blocks result: {}".format(result))
 
 
     # TODO: Maul code from part 1.1
