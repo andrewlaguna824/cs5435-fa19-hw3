@@ -61,7 +61,7 @@ def po_attack_2blocks(po, ctx):
     for i in range(15, -1, -1):
         test = bytearray(16)
         for j in range(i + 1, 16):
-            test[j] = plantext[j] ^ c0[j] ^ (16 - i)
+            test[j] = plaintext[j] ^ c0[j] ^ (16 - i)
         for val in range(256):
             test[i] = val
             C1_prime = test + c1
