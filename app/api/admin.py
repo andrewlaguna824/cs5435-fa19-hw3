@@ -47,7 +47,7 @@ def set_coins(db, session):
         print("********************************************")
         print("FINDME: bad padding for admin cookie")
         print("********************************************")
-        # response.status = 400
+        response.status = 400
         return template(
                 "profile",
                 user=admin,
