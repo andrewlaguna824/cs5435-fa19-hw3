@@ -113,7 +113,7 @@ if __name__ == "__main__":
     blocks = split_into_blocks(ciphertext)
 
     cleartext = []
-    for block_num, (c1, c2) in enumerate(zip([IV]+blocks, blocks)):
+    for block_num, (c1, c2) in enumerate(zip([IV]*len(blocks), blocks)):
         print("cracking block {} out of {}".format(block_num+1, len(blocks)))
         i2 = [0] * 16
         p2 = [0] * 16
