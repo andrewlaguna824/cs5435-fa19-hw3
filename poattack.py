@@ -57,15 +57,23 @@ def po_attack_2blocks(po, ctx):
     # TODO: Implement padding oracle attack for 2 blocks of messages.
 
     plaintext = bytearray(16)
+    passes = 0
     for i in range(15, -1, -1): 
         test = bytearray(16) 
         for val in range(256):
             test[i] = val
+            # Logical OR test byte with C1
+            # C1_prime = bytes(a | b for (a,b) in zip(c1, test))
+            C1_prime = test + c1
             print("test byte array: {}".format(test))
+            print("C prime: {}".format(C1_prime))
             # if check_padding_response(str(test).encode('utf-8')):
-            if check_padding_response(test):
+            if check_padding_response(C1_prime):
                 print("Padding passed")
+                passes += 1
                 plaintext[i] = val ^ c0[i] ^ (16 - i)
+                break
+    print("Passes: {}".format(passes))
     return plaintext
 
 def po_attack(po, ctx):
