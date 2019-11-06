@@ -68,11 +68,9 @@ def po_attack_2blocks(po, ctx):
     for i in range(15, -1, -1): 
         test = bytearray(16) 
         for val in range(256):
-            test[i] = bytes([val])
-            print(test)
-            # if test passes padding check then
+            test[i] = val
             if check_padding_response(str(test).encode('utf-8')):
-                plaintext[i] = val ^ c0[i] ^ bytes([i]) # Can't XOR bytes objects
+                plaintext[i] = val ^ c0[i] ^ (16 - i)
     return msg
 
 def po_attack(po, ctx):
