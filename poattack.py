@@ -129,12 +129,12 @@ if __name__ == "__main__":
     
     sess = Session()
     print("Cookie pre logon: {}".format(sess.cookies.get_dict()))
-    # uname ="victim"
-    # pw = "victim"
+    uname ="victim"
+    pw = "victim"
     # uname = "andrew"
     # pw = "hellomynameisandrewpalmeriliketosurf"
-    uname = 'test'
-    pw = 'thisisalongpasswordtotest'
+    # uname = 'test'
+    # pw = 'thisisalongpasswordtotest'
     assert(do_login_form(sess, uname,pw))
     print("Cookies after logon: {}".format(sess.cookies.get_dict()))
     admin_cookie = sess.cookies.get_dict()["admin"]
