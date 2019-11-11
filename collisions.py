@@ -53,7 +53,7 @@ if __name__=='__main__':
     # find the key used for hashing.
     ht_size = 2**16
     hash_key = b'\x00'*16
-    colls = find_collisions(hash_key, ht_size, 100)
+    colls = find_collisions(hash_key, ht_size, 20)
 
     print("Collisions: {}".format(colls))
 
