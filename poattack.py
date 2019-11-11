@@ -36,7 +36,7 @@ class PaddingOracle(object):
     # as the admin cookie, retrieve the request,
     # and see whether there was a padding error or not.
     def test_ciphertext(self, ct):
-        pass
+        pass 
 
 def split_into_blocks(msg, l):
     while msg:
@@ -64,13 +64,12 @@ def po_attack_2blocks(po, ctx):
     # Implement padding oracle attack for 2 blocks of messages.
 
     plaintext = bytearray(16)
-    # plaintext[0] = 255 # TODO: Don't init the admin byte to be 00, which looks valid to us
     count = 0
     for i in range(15, 0, -1):
         print("Checking i: {}".format(i))
         test = bytearray(16)
         for j in range(i + 1, 16):
-            test[j] = plaintext[j] ^ c0[j] ^ (16 - i) # TODO: Are we sure this is right?
+            test[j] = plaintext[j] ^ c0[j] ^ (16 - i)
         # print("test with padding: {}".format(test))
         for val in range(256):
             test[i] = val
@@ -81,9 +80,9 @@ def po_attack_2blocks(po, ctx):
                 count += 1
                 print("Padding passed: {}".format((i,val)))
                 plaintext[i] = val ^ c0[i] ^ (16 - i)
-                break # Keep me # TODO: See if we're getting multiple passes per index? -> Piazza post with Philippe?
+                break
 
-    # TODO: Need to recover last byte
+    # Need to recover last byte
     test = bytearray(32)
     for j in range(1, 16):
         test[j+16] = plaintext[j] ^ c0[j] ^ (16)
@@ -96,7 +95,8 @@ def po_attack_2blocks(po, ctx):
                 count += 1
                 print("Padding passed: {}".format((0,val)))
                 plaintext[0] = val ^ c0[0] ^ (16)
-                break # Keep me # TODO: See if we're getting multiple passes per index? -> Piazza post with Philippe?
+                return plaintext
+               
 
     if count < 16:
         print("Didn't recover full block. Recovered {} bytes only".format(count))
@@ -111,9 +111,8 @@ def po_attack(po, ctx):
     ctx_blocks = list(split_into_blocks(ctx, int(po.block_length)))
     nblocks = len(ctx_blocks)
     print("Number of ciphertext blocks: {}".format(nblocks))
-    # TODO: Implement padding oracle attack for arbitrary length message.
+    # Implement padding oracle attack for arbitrary length message.
   
-    # plaintext = bytearray(int(po.block_length) * nblocks)
     plaintext = bytearray()
     for i in range(nblocks - 1):
          print("Checking blocks C{} and C{}".format(i, i+1))
@@ -164,10 +163,10 @@ if __name__ == "__main__":
     # Create session and login to webserver
     sess = Session()
     # Change username and password to whatever you want
-    uname ="victim"
-    pw = "victim"
-    # uname = 'test'
-    # pw = 'thisisalongpasswordtotest'
+    uname ="admin"
+    pw = "admin"
+    # uname = "test"
+    # pw = "thisisalongerpasswordthanusual"
     assert(do_login_form(sess, uname,pw))
 
     print("Cookies after logon: {}".format(sess.cookies.get_dict()))
